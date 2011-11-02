@@ -1,0 +1,9 @@
+TESTS
+=====
+
+$> virtualenv .
+$> source bin/activate
+$> pip install tox
+$> tox
+
+Good luck ;o)
