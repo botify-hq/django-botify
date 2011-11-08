@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import urllib
 import time
 
@@ -57,6 +58,29 @@ class BotifyTest(test.TestCase):
             self.assertTrue(bool(is_crawlable))
 
         self.assertFalse(Botify.is_crawlable('http://example.test', USER_AGENTS[0][0]))
+
+    def test_special_characters(self):
+        user_agent = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+        botify = Botify({
+            'HTTP_HOST': 'http://example.test',
+            'PATH_INFO': '/Français',
+            'HTTP_USER_AGENT': user_agent,
+            'REMOTE_ADDR': '127.0.0.1'
+        })
+
+        bot = '<ip>%s</ip><ua>%s</ua>' % (botify.ip, botify.user_agent)
+
+        with nested(
+            patch.object(Botify, 'send_data'),
+            patch.object(time, 'time')
+        ) as (send_data_method, time_method):
+            send_data_method.return_value = True
+            current_time = 1319812537
+            time_method.return_value = current_time
+
+            botify.set_code(200)
+
+            data = botify.record()
 
     def test_format_data(self):
         user_agent = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
